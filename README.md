@@ -1,11 +1,11 @@
 # MatrixCalc
 Simple matrix calculator with Arduino, Nokia 5110 (G)LCD (Phillips PCD8544) and a membrane keypad.
 
-![splash](https://raw.githubusercontent.com/shreyask21/matrixcalc/master/img/s1.jpg "Splash Screen")
+![splash](https://github.com/shreyask21/matrixcalc/raw/master/img/s1.jpg "Splash Screen")
 
-![Pic](https://raw.githubusercontent.com/shreyask21/matrixcalc/master/img/s2.jpg "Sample")
+![Pic](https://github.com/shreyask21/matrixcalc/raw/master/img/s2.jpg "Sample")
 
-![Pic](https://raw.githubusercontent.com/shreyask21/matrixcalc/master/img/s3.jpg "Sample")
+![Pic](https://github.com/shreyask21/matrixcalc/raw/master/img/s3.jpg "Sample")
 
 ## Libraries:
 The following Libraries are needed:
@@ -18,7 +18,7 @@ The following Libraries are needed:
 
 **You can also install them from the Arduino IDE library manager.**
 
-![Libs](https://raw.githubusercontent.com/shreyask21/matrixcalc/master/img/s4.png "Library Manager")
+![Libs](https://github.com/shreyask21/matrixcalc/raw/master/img/s4.png "Library Manager")
 
 ## Connections:
 
