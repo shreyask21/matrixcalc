@@ -16,9 +16,9 @@
 
     Connect the Nokia LCD to Arduino Nano as follows:
     ####################################################
-    A3         ->     RST
-    A2         ->     CE
-    A1         ->     DC
+    A2         ->     RST
+    A3         ->     CE
+    A4         ->     DC
     D11        ->     DIN
     A5         ->     CLK
     VCC        ->     3.3V
@@ -39,14 +39,15 @@
 #define RowPin3 7
 #define RowPin4 6
 /* LCD */
-int RST = 17; //A3
-int CE = 16; //A2
-int DC = 15; //A1
+#define SetLCDBias //comment that out if you have blue backlight LCD.
+int RST = 16; //A2
+int CE = 17; //A3
+int DC = 18; //A4
 int DIN = 11; //D11
 int CLK = 19; //A5
 /***********************************************************************************/
 
-
+#include <EEPROM.h>
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_PCD8544.h>
@@ -120,16 +121,20 @@ int resultmat[9] = {0, 0, 0, 0, 0, 0, 0, 0, 0};
 int det = 0, i = 0;
 /************************/
 
-Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS ); //Init keypad as "keypad" object.
+/* Integers for storing contrast adjustment*/
+int defaultcontrast, setcontrast;
+/************************/
 
+/*Initialize and create objects*/
+Keypad keypad = Keypad( makeKeymap(keys), rowPins, colPins, ROWS, COLS ); //Init keypad as "keypad" object.
 Adafruit_PCD8544 display = Adafruit_PCD8544(CLK, DIN, DC, CE, RST); //Init Nokia 5110 display driver.
+/************************/
 
 void setup()  {
-
   /*Init display with parameters and show splash screen*/
   display.begin();
-  display.clearDisplay();
-  display.setContrast(45);
+  chkContrast();
+  display.setContrast(EEPROM.read(256));
   display.drawBitmap(0, 0, bmp, 84, 44, 1);
   display.display();
   delay(3500);
@@ -142,7 +147,7 @@ void setup()  {
   main_menu(); //Start the main menu
 }
 
-
+/*Main Menu*/
 void main_menu() {
   display.clearDisplay();
   display.drawLine(0, 0, 83, 0, BLACK);
@@ -171,42 +176,38 @@ void main_menu() {
     {
       case NO_KEY:
         break;
-
       case '1':
         getmatrixA();
         break;
-
       case '2':
         getmatrixB();
         break;
-
       case '3':
         showdet();
         break;
-
       case '4':
         showadj();
         break;
-
       case '5':
         showinv();
         break;
-
       case '6':
         mulmatrix();
         break;
-
       case '7':
         addmatrix();
         break;
-
       case '8':
         submatrix();
+        break;
+      case 'A':
+        AdjustContrast();
         break;
     }
     key = keypad.getKey();
   }
 }
+/************************/
 
 /*Get user input for matrix "A"*/
 void getmatrixA() {
@@ -501,6 +502,103 @@ void splash_text(char text[], bool wait) {
     display.clearDisplay();
     display.display();
   }
+}
+/************************/
+
+/*Sets LCD bias voltage*/
+void setbias(byte cmd) {
+  digitalWrite(DC, LOW);
+  digitalWrite(CE, LOW);
+  shiftOut(DIN, CLK, MSBFIRST, cmd);
+  digitalWrite(CE, HIGH);
+}
+/************************/
+
+/*Menu for adjusting contrast*/
+void AdjustContrast() {
+  display.clearDisplay();
+  display.display();
+  display.setCursor(20, 5);
+  display.setTextColor(WHITE, BLACK);
+  display.print("Contrast");
+  display.setCursor(20, 29);
+  display.setTextColor(BLACK);
+  display.print("Contrast");
+  display.setCursor(0, 41);
+  display.setTextColor(BLACK);
+  display.print("Saved @ EEPROM");
+  display.display();
+  char key = keypad.getKey();
+  while (key != '#')
+  {
+    switch (key)
+    {
+      case NO_KEY:
+        break;
+      case '1':
+        setcontrast = defaultcontrast - 20;
+        display.setContrast(defaultcontrast - 20);
+        break;
+      case '2':
+        setcontrast = defaultcontrast - 15;
+        display.setContrast(setcontrast);
+        break;
+      case '3':
+        setcontrast = defaultcontrast - 10;
+        display.setContrast(setcontrast);
+        break;
+      case '4':
+        setcontrast = defaultcontrast - 5;
+        display.setContrast(setcontrast);
+        break;
+      case '5':
+        setcontrast = defaultcontrast;
+        display.setContrast(setcontrast);
+        break;
+      case '6':
+        setcontrast = defaultcontrast + 5;
+        display.setContrast(setcontrast);
+        break;
+      case '7':
+        setcontrast = defaultcontrast + 10;
+        display.setContrast(setcontrast);
+        break;
+      case '8':
+        setcontrast = defaultcontrast + 15;
+        display.setContrast(setcontrast);
+        break;
+      case '9':
+        setcontrast = defaultcontrast + 20;
+        display.setContrast(setcontrast);
+        break;
+    }
+    key = keypad.getKey();
+    delay(100);
+  }
+  EEPROM.update(64, 64);
+  EEPROM.update(256, setcontrast);
+  display.clearDisplay();
+  display.display();
+  main_menu();
+}
+/************************/
+
+/*Checks if contrast value is stored in EEPROM*/
+void chkContrast() {
+  display.clearDisplay();
+#ifdef SetLCDBias
+  defaultcontrast = 36;
+  setbias(0x9);
+  if (EEPROM.read(64) != 64) {
+    EEPROM.update(256, defaultcontrast);
+  }
+#endif
+#ifndef SetLCDBias
+  defaultcontrast = 45;
+  if (EEPROM.read(64) != 64) {
+    EEPROM.update(256, defaultcontrast);
+  }
+#endif
 }
 /************************/
 

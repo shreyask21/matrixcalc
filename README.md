@@ -28,9 +28,9 @@ _I have used Arduino nano for this but for other boards you can modify the pin c
 
 | Display Pin   | Arduino Pin   |
 | ------------- | ------------- |
-|      RST      |       A3      |
-|      CE       |       A2      |
-|      DC       |       A1      |
+|      RST      |       A2      |
+|      CE       |       A3      |
+|      DC       |       A4      |
 |      DIN      |      D11      |
 |      CLK      |       A5      |
 |      VCC      |      3.3V     |
