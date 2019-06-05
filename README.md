@@ -57,4 +57,5 @@ _I have used Arduino nano for this but for other boards you can modify the pin c
 |    0 to 9     |  Number Input/Menu Selection      |
 |      *       |       Negate (After input)      |
 |      #       |       Enter      |
+|      A       |       Adjust Contrast      |
 |      C       |       Clear stored number      |
